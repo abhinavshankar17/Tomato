@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const expressLayouts = require('express-ejs-layouts');
 
 
 app.set('view engine', 'ejs');
