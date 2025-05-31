@@ -4,7 +4,11 @@ const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
-const User = require('./models/users'); 
+const User = require('./models/users');
+
+
+app.use(expressLayouts);
+app.set('layout', 'layouts/boilerplate'); 
 
 mongoose.connect('mongodb://localhost:27017/Tomato')
 .then(() => {
@@ -24,12 +28,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-app.use('/', (req , res) => {
+app.get('/', (req , res) => {
     res.render('home');
 });
 
-app.get('/signup', (req, res) => {
-    res.render('signup');
+app.get('/register', (req, res) => {
+    res.render('users/register');
 });
 
 app.post('/signup', async (req, res) => {
