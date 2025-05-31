@@ -14,7 +14,7 @@ module.exports.register =
          req.login(registeredUser , err => {
             if(err) return next(err)
          req.flash('success' ,'Welcome to Tomato')
-         res.redirect('/campgrounds')
+         res.redirect('/home')
          })
          
         }catch(e){
