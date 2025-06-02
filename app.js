@@ -59,6 +59,9 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
     res.render('home');
 });
+app.get('/home', (req, res) => {
+    res.render('home');
+});
 
 app.get('/register', (req, res) => {
     res.render('users/register');
@@ -67,6 +70,8 @@ app.get('/register', (req, res) => {
 app.get('/login', (req, res) => {
     res.render('users/login');
 });
+
+//  Handle registration submission
 
 app.post('/register', async (req, res) => {
     try {
@@ -83,6 +88,15 @@ app.post('/register', async (req, res) => {
         req.flash('error', err.message);
         res.redirect('/register');
     }
+});
+
+// Handle login submission
+app.post('/login', passport.authenticate('local', {
+    failureFlash: true,
+    failureRedirect: '/login'
+}), (req, res) => {
+    req.flash('success', 'Welcome back!');
+    res.redirect('/');
 });
 
 app.listen(8000, () => {
