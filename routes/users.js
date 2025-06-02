@@ -5,7 +5,7 @@ const catchAsync = require('../utilities/catchAsync.js')
 const passport = require('passport')
 const { storeReturnTo } = require('../middleware');
 const users = require('../controllers/users')
-const user = require('../models/user')
+const user = require('../models/users')
 
 router.route('/register')
     .get(users.renderRegister)
