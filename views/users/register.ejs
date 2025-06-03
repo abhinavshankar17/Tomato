@@ -71,6 +71,13 @@
             <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
                 <div class="card shadow">
                     <div class="card-body">
+                        <% if (error && error.length > 0) { %>
+    <div class="alert alert-danger text-center">
+        <p><%= error %></p>
+        <a href="/login" class="btn btn-danger mt-2">Login Instead</a>
+    </div>
+<% } %>
+
                         <h1 class="text-center mb-4">Create an Account</h1>
                         <form action="/register" method="post" class="validated-form" novalidate>
                             <div class="mb-3">

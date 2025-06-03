@@ -212,6 +212,15 @@ app.post('/login', passport.authenticate('local', {
 // Main page
 app.get('/main', (req, res) => res.render('main'));
 
+app.post('/logout', (req, res, next) => {
+    req.logout(err => {
+        if (err) return next(err);
+        req.flash('success', 'Logged out successfully!');
+        res.redirect('/home');
+    });
+});
+
+
 // Start Server
 app.listen(8000, () => {
     console.log('Serving on port 8000');

@@ -33,10 +33,20 @@
       </div>
 
       <!-- Right: Get a ride + Auth buttons -->
-      <div class="d-flex align-items-center gap-3">
-        <a href="/login" class="btn btn-light rounded-pill px-4">Log in</a>
-        <a href="/register" class="btn btn-dark rounded-pill px-4">Sign up</a>
-      </div>
+      <% if (!currentUser) { %>
+  <div class="d-flex align-items-center gap-3">
+    <a href="/login" class="btn btn-light rounded-pill px-4">Log in</a>
+    <a href="/register" class="btn btn-dark rounded-pill px-4">Sign up</a>
+  </div>
+<% } else { %>
+  <div class="d-flex align-items-center gap-3">
+    <span class="me-2 fw-bold">Hi, <%= currentUser.name %></span>
+    <form action="/logout" method="POST">
+      <button type="submit" class="btn btn-outline-danger rounded-pill px-4">Logout</button>
+    </form>
+  </div>
+<% } %>
+
     </div>
   </nav>
 
