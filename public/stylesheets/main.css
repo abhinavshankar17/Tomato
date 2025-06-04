@@ -1,6 +1,6 @@
 .food-icon {
-  width: 100px;
-  height: 100px;
+  width: 140px;
+  height: 140px;
   object-fit: cover;
   border: 2px solid #eee;
   transition: transform 0.2s ease;
