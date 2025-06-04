@@ -1,0 +1,34 @@
+.food-icon {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 2px solid #eee;
+  transition: transform 0.2s ease;
+}
+
+.food-icon:hover {
+  transform: scale(1.05);
+  border-color: #dc3545;
+}
+
+/* Default hover (only if not clicked) */
+  #vegBtn:not(.clicked):hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+
+  #vegBtn:not(.clicked):hover i {
+    color: white;
+  }
+
+  /* When clicked - stay red */
+  #vegBtn.clicked {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+
+  #vegBtn.clicked i {
+    color: white;
+  }
