@@ -8,7 +8,7 @@ module.exports.restaurantRegister = async (req, res, next) => {
     try {
         const {
             ownerName,
-            username, // ownerEmail will be received as "username"
+            ownerEmail, 
             password,
             ownerPhone,
             restaurantName,
@@ -40,8 +40,12 @@ module.exports.restaurantRegister = async (req, res, next) => {
             res.redirect('/owners/dashboard'); // adjust as per your app's flow
         });
     } catch (e) {
+    if (e.name === 'UserExistsError') {
+        req.flash('error', 'Email already registered. Please login.');
+    } else {
         req.flash('error', e.message);
-        res.redirect('/owners/restregister');
-        console.log(e); // Log the error for debugging
     }
+    res.redirect('/owners/restregister');
+
+}
 };
