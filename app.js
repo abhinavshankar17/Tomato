@@ -114,6 +114,14 @@ app.post('/owners/restlogin', passport.authenticate('owner-local', {
     req.flash('success', 'Welcome back!');
     res.redirect('/owners/dashboard');
 });
+
+app.get('/owners/dashboard', (req, res) => {
+    res.render('owners/dashboard', {
+        owner: req.user,
+        success: req.flash('success')
+    });
+});
+
 // Owner Auth Routes (controllers handled in /routes/owners.js)
 app.use('/owners', ownerRoutes);
 

@@ -42,7 +42,7 @@ module.exports.restaurantRegister = async (req, res, next) => {
         req.login(registeredOwner, (err) => {
             if (err) return next(err);
             req.flash('success', 'Welcome to Tomato, Partner!');
-            res.redirect('/owners/dashboard'); // adjust as needed
+            res.redirect('/owners/dashboard'); 
         });
 
     } catch (e) {
