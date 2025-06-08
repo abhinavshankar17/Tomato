@@ -145,18 +145,11 @@
       <h2 class="form-title">Let's Partner Up &#x1f91d;</h2>
 
       <!-- Flash Messages -->
-     <% if (error && error.length > 0) { %>
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <%= error[0] %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% } %>
-
-<% if (success && success.length > 0) { %>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= success[0] %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
+      <% if (error && error.length > 0) { %>
+    <div class="alert alert-danger text-center">
+        <p><%= error %></p>
+        <a href="/owners/restlogin" class="btn btn-danger mt-2">Login Instead</a>
+    </div>
 <% } %>
 
       <form action="/owners/restregister" method="POST">

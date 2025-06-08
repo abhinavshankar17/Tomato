@@ -1,3 +1,4 @@
+
 const Owner = require('../models/owners');
 
 module.exports.renderRestaurantRegister = (req, res) => {
@@ -8,7 +9,7 @@ module.exports.restaurantRegister = async (req, res, next) => {
     try {
         const {
             ownerName,
-            ownerEmail, 
+            ownerEmail,
             password,
             ownerPhone,
             restaurantName,
@@ -17,7 +18,11 @@ module.exports.restaurantRegister = async (req, res, next) => {
         } = req.body;
 
         // Check for duplicate email
-        const existingOwner = await Owner.findOne({ ownerEmail: username });
+        // if (!ownerName || !ownerEmail || !password || !ownerPhone || !restaurantName || !restaurantAddress || !cuisineType) {
+        //     req.flash('error', 'All fields are required.');
+        //     return res.redirect('/owners/restregister');
+        // }
+        const existingOwner = await Owner.findOne({ ownerEmail });
         if (existingOwner) {
             req.flash('error', 'An account with this email already exists.');
             return res.redirect('/owners/restregister');
@@ -25,7 +30,7 @@ module.exports.restaurantRegister = async (req, res, next) => {
 
         const newOwner = new Owner({
             ownerName,
-            ownerEmail: username,
+            ownerEmail,
             ownerPhone,
             restaurantName,
             restaurantAddress,
@@ -37,15 +42,15 @@ module.exports.restaurantRegister = async (req, res, next) => {
         req.login(registeredOwner, (err) => {
             if (err) return next(err);
             req.flash('success', 'Welcome to Tomato, Partner!');
-            res.redirect('/owners/dashboard'); // adjust as per your app's flow
+            res.redirect('/owners/dashboard'); // adjust as needed
         });
-    } catch (e) {
-    if (e.name === 'UserExistsError') {
-        req.flash('error', 'Email already registered. Please login.');
-    } else {
-        req.flash('error', e.message);
-    }
-    res.redirect('/owners/restregister');
 
-}
+    } catch (e) {
+        if (e.name === 'UserExistsError') {
+            req.flash('error', 'Email already registered. Please login.');
+        } else {
+            req.flash('error', e.message);
+        }
+        res.redirect('/owners/restregister');
+    }
 };
