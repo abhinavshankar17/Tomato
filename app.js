@@ -14,6 +14,8 @@ const Owner = require('./models/owners');     // Owner model
 const userController = require('./controllers/users');
 const ownerRoutes = require('./routes/owners');
 const ownerController = require('./controllers/owners');
+const menuRoutes = require('./routes/menu');
+
 
 // MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/Tomato')
@@ -41,6 +43,9 @@ const sessionConfig = {
 };
 app.use(session(sessionConfig));
 app.use(flash());
+
+//Menu Routes
+app.use('/menu', menuRoutes);
 
 // Passport Setup
 app.use(passport.initialize());
@@ -140,6 +145,7 @@ app.get('/owners/dashboard', (req, res) => {
     res.render('owners/dashboard', { owner: req.user });
 });
 
+app.get('/menu', (req, res) => res.render('owners/menu'));
 
 
 // Logout route
