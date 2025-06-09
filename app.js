@@ -131,6 +131,17 @@ app.get('/restaurant', (req, res) => res.render('restaurant'));
 // User main dashboard
 app.get('/main', (req, res) => res.render('main'));
 
+//Owner dashboard
+app.get('/owners/dashboard', (req, res) => {
+    if (!req.isAuthenticated() || !(req.user instanceof Owner)) {
+        req.flash('error', 'You must be logged in as a restaurant owner to access this page.');
+        return res.redirect('/owners/restlogin');
+    }
+    res.render('owners/dashboard', { owner: req.user });
+});
+
+
+
 // Logout route
 app.post('/logout', (req, res, next) => {
     req.logout(err => {
