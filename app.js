@@ -1,5 +1,9 @@
 // Description: Main application file for the Tomato restaurant management system.
 
+
+require('dotenv').config();
+
+
 const express = require('express');
 const app = express();
 const path = require('path');
