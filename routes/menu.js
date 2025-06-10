@@ -1,40 +1,35 @@
+
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // unique filename
-  }
-});
+const { storage } = require('../cloudinary/storage');
 const upload = multer({ storage });
 
-// Controller or inline logic
-const MenuItem = require('../models/menuItem'); // Create a Mongoose model for menu items
+const MenuItem = require('../models/menuItem');
+const { isLoggedIn } = require('../middleware');
 
-router.post('/add', upload.single('foodImage'), async (req, res) => {
-  const { foodName, category, price, ingredients, description, spiceLevel, isAvailable } = req.body;
-  const foodImage = req.file ? `/uploads/${req.file.filename}` : null;
+router.post('/add', isLoggedIn, upload.single('foodImage'), async (req, res) => {
+  try {
+    const { foodName, category, price, ingredients, description, spiceLevel, isAvailable } = req.body;
+    const imageUrl = req.file?.path;
 
-  const newItem = new MenuItem({
-    name: foodName,
-    category,
-    price,
-    ingredients,
-    description,
-    spiceLevel,
-    isAvailable: isAvailable === 'true',
-    imageUrl: foodImage
-  });
+    const newItem = new MenuItem({
+      name: foodName,
+      category,
+      price,
+      ingredients,
+      description,
+      spiceLevel,
+      isAvailable: isAvailable === 'true',
+      imageUrl,
+      owner: req.user._id
+    });
 
-  await newItem.save();
-  req.flash('success', 'Food item added to menu!');
-  res.redirect('/owners/dashboard'); // or redirect to a menu list page
+    await newItem.save();
+    req.flash('success', 'Food item added!');
+    res.redirect('/owners/dashboard/menulisting');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
 });
-
-module.exports = router;

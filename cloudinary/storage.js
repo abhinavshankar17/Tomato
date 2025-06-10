@@ -3,11 +3,12 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: (req, file) => {
-    const restaurantId = req.user._id.toString();
+  params: async (req, file) => {
+    const userId = req.user._id.toString(); // creates a folder per restaurant
     return {
-      folder: `Tomato/${restaurantId}`,
-      allowed_formats: ['jpeg', 'png', 'jpg']
+      folder: `Tomato/${userId}`,
+      allowed_formats: ['jpeg', 'png', 'jpg'],
+      public_id: Date.now().toString() // optional: makes filename unique
     };
   }
 });
