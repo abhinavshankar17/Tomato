@@ -8,7 +8,12 @@ const menuItemSchema = new mongoose.Schema({
   description: String,
   spiceLevel: String,
   isAvailable: Boolean,
-  imageUrl: String
+  imageUrl: String,
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Owner',
+    required: true
+  }
 });
 
 module.exports = mongoose.model('MenuItem', menuItemSchema);

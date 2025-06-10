@@ -66,8 +66,8 @@
       <a href="/menu" class="btn btn-add">Add Food to Menu</a>
     </div>
 
-    <% if (menuItem && menuItem.length > 0) { %>
-      <% menuItem.forEach(item => { %>
+    <% if (menuItems && menuItems.length > 0) { %>
+      <% menuItems.forEach(item => { %>
         <div class="food-card">
           <div class="food-info">
             <img src="<%= item.imageUrl %>" alt="Food" class="food-img">
