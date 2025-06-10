@@ -1,3 +1,4 @@
+// Description: Main application file for the Tomato restaurant management system.
 
 const express = require('express');
 const app = express();
@@ -9,28 +10,30 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
 
-const User = require('./models/users');       // User model
-const Owner = require('./models/owners');     // Owner model
+const User = require('./models/users');
+const Owner = require('./models/owners');
 const userController = require('./controllers/users');
-const ownerRoutes = require('./routes/owners');
 const ownerController = require('./controllers/owners');
+const ownerRoutes = require('./routes/owners');
 const menuRoutes = require('./routes/menu');
 
-
-// MongoDB Connection
+// ------------------ MONGOOSE SETUP ------------------
 mongoose.connect('mongodb://localhost:27017/Tomato')
     .then(() => console.log("MongoDB connection established."))
     .catch(err => console.error("MongoDB connection error:", err));
 
-// View Engine Setup
+// ------------------ MIDDLEWARE ------------------
+// Static files and parsing
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
+
+// View engine
 app.use(expressLayouts);
 app.set('layout', 'layouts/boilerplate');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true }));
 
-// Session Config
+// Session middleware (must be before passport)
 const sessionConfig = {
     secret: 'thisshouldbebetterasecret!',
     resave: false,
@@ -44,21 +47,15 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
-//Menu Routes
-app.use('/menu', menuRoutes);
-
-// Passport Setup
+// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Local strategy for Users
+// Passport Local Strategies
 passport.use('user-local', new LocalStrategy({ usernameField: 'email' }, User.authenticate()));
-// Local strategy for Owners
-// passport.use('owner-local', new LocalStrategy({ usernameField: 'username' }, Owner.authenticate()));
 passport.use('owner-local', new LocalStrategy(Owner.authenticate()));
 
-
-// Serialize and deserialize both user types
+// Serialize/deserialize
 passport.serializeUser((user, done) => {
     done(null, { id: user.id, type: user instanceof User ? 'User' : 'Owner' });
 });
@@ -77,7 +74,7 @@ passport.deserializeUser(async (obj, done) => {
     }
 });
 
-// Flash + Current User middleware
+// Flash messages and current user setup
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
@@ -86,12 +83,15 @@ app.use((req, res, next) => {
 });
 
 // ------------------ ROUTES ------------------
+// Menu and Owner routes
+app.use('/menu', menuRoutes);
+app.use('/owners', ownerRoutes);
 
-// Home routes
+// Home
 app.get('/', (req, res) => res.render('home'));
 app.get('/home', (req, res) => res.render('home'));
 
-// User Routes
+// User Registration/Login
 app.get('/register', userController.renderRegister);
 app.post('/register', userController.register);
 
@@ -104,39 +104,20 @@ app.post('/login', passport.authenticate('user-local', {
     res.redirect('/main');
 });
 
-// Owner Form Views (direct routes)
+// Owner Registration/Login
 app.get('/owners/restregister', ownerController.renderRestaurantRegister);
 app.post('/owners/restregister', ownerController.restaurantRegister);
-// app.get('/register', userController.renderRegister);
-// app.post('/register', userController.register);
 
 app.get('/owners/restlogin', (req, res) => res.render('owners/restlogin'));
-// Owner Login Route
 app.post('/owners/restlogin', passport.authenticate('owner-local', {
     failureFlash: true,
-    failureRedirect: '/restlogin'
+    failureRedirect: '/owners/restlogin'
 }), (req, res) => {
     req.flash('success', 'Welcome back!');
     res.redirect('/owners/dashboard');
 });
 
-app.get('/owners/dashboard', (req, res) => {
-    res.render('owners/dashboard', {
-        owner: req.user,
-        success: req.flash('success')
-    });
-});
-
-// Owner Auth Routes (controllers handled in /routes/owners.js)
-app.use('/owners', ownerRoutes);
-
-// Static restaurant info page
-app.get('/restaurant', (req, res) => res.render('restaurant'));
-
-// User main dashboard
-app.get('/main', (req, res) => res.render('main'));
-
-//Owner dashboard
+// Owner Dashboard (protected route)
 app.get('/owners/dashboard', (req, res) => {
     if (!req.isAuthenticated() || !(req.user instanceof Owner)) {
         req.flash('error', 'You must be logged in as a restaurant owner to access this page.');
@@ -145,10 +126,16 @@ app.get('/owners/dashboard', (req, res) => {
     res.render('owners/dashboard', { owner: req.user });
 });
 
+// User Dashboard
+app.get('/main', (req, res) => res.render('main'));
+
+// Static Restaurant Page
+app.get('/restaurant', (req, res) => res.render('restaurant'));
+
+// Menu Page (direct access)
 app.get('/menu', (req, res) => res.render('owners/menu'));
 
-
-// Logout route
+// Logout
 app.post('/logout', (req, res, next) => {
     req.logout(err => {
         if (err) return next(err);
@@ -157,7 +144,8 @@ app.post('/logout', (req, res, next) => {
     });
 });
 
-// Start Server
+// ------------------ SERVER ------------------
 app.listen(8000, () => {
     console.log('Server is running on port 8000');
 });
+
