@@ -19,6 +19,7 @@
 // module.exports = mongoose.model('MenuItem', menuItemSchema);
 
 const mongoose = require('mongoose');
+const { type } = require('os');
 
 const menuItemSchema = new mongoose.Schema({
   name: String,
@@ -27,7 +28,10 @@ const menuItemSchema = new mongoose.Schema({
   ingredients: String,
   description: String,
   spiceLevel: String,
-  isAvailable: Boolean,
+  isAvailable: {
+    type: Boolean,
+    default: true // Default value for isAvailable
+  },
   imageUrl: String,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // ✅ required
 });

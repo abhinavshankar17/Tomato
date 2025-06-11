@@ -68,7 +68,7 @@
 
     <% if (menuItems && menuItems.length > 0) { %>
       <% menuItems.forEach(item => { %>
-        <div class="food-card">
+        <!-- <div class="food-card">
           <div class="food-info">
             <img src="<%= item.imageUrl %>" alt="Food" class="food-img">
             <div>
@@ -78,20 +78,56 @@
             </div>
           </div>
           <div>
-            <form action="/owners/menu/toggle/<%= item._id %>" method="POST">
-              <div class="form-check form-switch">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
-                  name="available" 
-                  onchange="this.form.submit()" 
-                  <%= item.available ? 'checked' : '' %>
-                >
-                <label class="form-check-label"><%= item.available ? 'Available' : 'Unavailable' %></label>
-              </div>
-            </form>
+            <form action="/menu/toggle-availability/<%= item._id %>" method="POST">
+  <div class="form-check form-switch">
+    <input 
+      class="form-check-input" 
+      type="checkbox" 
+      name="isAvailable" 
+      onchange="this.form.submit()" 
+      <%= item.isAvailable ? 'checked' : '' %>
+    >
+    <label class="form-check-label">
+      <%= item.isAvailable ? 'Available' : 'Unavailable' %>
+    </label>
+  </div>
+</form>
           </div>
-        </div>
+        </div> -->
+        <div class="food-card">
+  <div class="food-info">
+    <img src="<%= item.imageUrl %>" alt="Food" class="food-img">
+    <div>
+      <h5><%= item.name %></h5>
+      <p class="mb-0"><strong>₹<%= item.price %></strong> | <%= item.category %></p>
+      <small>Ingredients: <%= item.ingredients %></small>
+    </div>
+  </div>
+  <div class="d-flex flex-column align-items-end">
+    <!-- Toggle -->
+    <form action="/owners/menu/toggle/<%= item._id %>" method="POST" class="mb-2">
+      <div class="form-check form-switch">
+        <input 
+          class="form-check-input" 
+          type="checkbox" 
+          name="available" 
+          onchange="this.form.submit()" 
+          <%= item.available ? 'checked' : '' %>
+        >
+        <label class="form-check-label"><%= item.available ? 'Available' : 'Unavailable' %></label>
+      </div>
+    </form>
+
+    <!-- Update -->
+    <a href="/owners/menu/edit/<%= item._id %>" class="btn btn-sm btn-outline-primary mb-1">Edit</a>
+
+    <!-- Delete -->
+    <form action="/owners/menu/delete/<%= item._id %>" method="POST">
+      <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this item?')">Delete</button>
+    </form>
+  </div>
+</div>
+
       <% }) %>
     <% } else { %>
       <p>No food items added yet.</p>

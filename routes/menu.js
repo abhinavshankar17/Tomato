@@ -33,6 +33,21 @@ router.post('/add', isLoggedIn, upload.single('foodImage'), async (req, res) => 
   }
 });
 
+router.post('/toggle-availability/:id', isLoggedIn, async (req, res) => {
+  try {
+    const item = await MenuItem.findById(req.params.id);
+    if (!item) return res.status(404).send('Item not found');
+    
+    item.isAvailable = !item.isAvailable;
+    await item.save();
+    
+    res.redirect('/owners/dashboard/menulisting');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
 console.log('menu.js loaded successfully');
 
 module.exports = router;

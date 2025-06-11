@@ -82,16 +82,7 @@ router.get('/restaurantlogout', (req, res, next) => {
     res.redirect('/home');
   });
 });
-
-// router.get('/dashboard/menulisting', async (req, res) => {
-//   try {
-//     const menuItems = await MenuItem.find({ owner: req.user._id });
-//     res.render('owners/dashboard/menulisting', { menuItems });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send('Server Error');
-//   }
-// });
+ 
 
 router.get('/dashboard/menulisting', isLoggedIn, async (req, res) => {
   try {
@@ -101,6 +92,33 @@ router.get('/dashboard/menulisting', isLoggedIn, async (req, res) => {
     console.error(err);
     res.status(500).send('Server Error');
   }
+});
+// Edit form
+router.get('/menu/edit/:id', async (req, res) => {
+  const item = await MenuItem.findById(req.params.id);
+  res.render('owners/editFoodItem', { item });
+});
+
+// Update handler
+router.post('/menu/edit/:id', async (req, res) => {
+  const { foodName, category, price, ingredients, description, spiceLevel } = req.body;
+  await MenuItem.findByIdAndUpdate(req.params.id, {
+    name: foodName,
+    category,
+    price,
+    ingredients,
+    description,
+    spiceLevel
+  });
+  req.flash('success', 'Food item updated!');
+  res.redirect('/owners/dashboard/menulisting');
+});
+
+// Delete handler
+router.post('/menu/delete/:id', async (req, res) => {
+  await MenuItem.findByIdAndDelete(req.params.id);
+  req.flash('success', 'Food item deleted!');
+  res.redirect('/owners/dashboard/menulisting');
 });
 
 
