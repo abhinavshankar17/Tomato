@@ -17,11 +17,6 @@ module.exports.restaurantRegister = async (req, res, next) => {
             cuisineType
         } = req.body;
 
-        // Check for duplicate email
-        // if (!ownerName || !ownerEmail || !password || !ownerPhone || !restaurantName || !restaurantAddress || !cuisineType) {
-        //     req.flash('error', 'All fields are required.');
-        //     return res.redirect('/owners/restregister');
-        // }
         const existingOwner = await Owner.findOne({ ownerEmail });
         if (existingOwner) {
             req.flash('error', 'An account with this email already exists.');

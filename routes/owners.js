@@ -1,22 +1,23 @@
-// This file handles the routes for restaurant owners, including registration, login, and dashboard functionalities.
 
 const express = require('express');
 const passport = require('passport');
 const Owner = require('../models/owners');
 const router = express.Router();
-const MenuItem = require('../models/menuItem'); // Assuming you have a MenuItem model for managing menu items
+const MenuItem = require('../models/menuItem');
 
-// Middleware for checking if the user is logged in
+// Middleware to protect routes
 const { isLoggedIn } = require('../middleware/auth');
 
+// =====================
+// OWNER REGISTRATION
+// =====================
 
-
-// REGISTER (GET)
+// GET: Registration form
 router.get('/restaurantregister', (req, res) => {
-  res.render('owners/restregister'); 
+  res.render('owners/restregister');
 });
 
-// REGISTER (POST)
+// POST: Register new owner
 router.post('/restregister', async (req, res, next) => {
   try {
     const {
@@ -30,16 +31,18 @@ router.post('/restregister', async (req, res, next) => {
       cuisineType
     } = req.body;
 
-    // 🔒 Check for duplicate email
+    // Check for duplicate email
     const existingOwner = await Owner.findOne({ ownerEmail });
     if (existingOwner) {
       req.flash('error', 'An account with this email already exists.');
       return res.redirect('/owners/restregister');
     }
 
+    // ✅ Explicitly assign username (required by passport-local-mongoose)
     const newOwner = new Owner({
-      ownerName,
+      username: ownerEmail,
       ownerEmail,
+      ownerName,
       ownerPhone,
       restaurantName,
       restaurantPhone,
@@ -60,12 +63,16 @@ router.post('/restregister', async (req, res, next) => {
   }
 });
 
-// LOGIN (GET)
+// =====================
+// LOGIN / LOGOUT
+// =====================
+
+// GET: Login form
 router.get('/restlogin', (req, res) => {
-  res.render('owners/restlogin'); 
+  res.render('owners/restlogin');
 });
 
-// LOGIN (POST)
+// POST: Login
 router.post('/restlogin', passport.authenticate('owner-local', {
   failureRedirect: '/owners/restlogin',
   failureFlash: true
@@ -74,7 +81,7 @@ router.post('/restlogin', passport.authenticate('owner-local', {
   res.redirect('/owners/dashboard');
 });
 
-// LOGOUT
+// GET: Logout
 router.get('/restaurantlogout', (req, res, next) => {
   req.logout(err => {
     if (err) return next(err);
@@ -82,8 +89,12 @@ router.get('/restaurantlogout', (req, res, next) => {
     res.redirect('/home');
   });
 });
- 
 
+// =====================
+// DASHBOARD & CRUD
+// =====================
+
+// GET: Menu Listing
 router.get('/dashboard/menulisting', isLoggedIn, async (req, res) => {
   try {
     const menuItems = await MenuItem.find({ owner: req.user._id });
@@ -93,13 +104,27 @@ router.get('/dashboard/menulisting', isLoggedIn, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-// Edit form
+
+// POST: Toggle availability
+router.post('/menu/toggle/:id', async (req, res) => {
+  try {
+    const item = await MenuItem.findById(req.params.id);
+    item.isAvailable = !item.isAvailable;
+    await item.save();
+    res.redirect('/owners/dashboard/menulisting');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// GET: Edit form
 router.get('/menu/edit/:id', async (req, res) => {
   const item = await MenuItem.findById(req.params.id);
   res.render('owners/editFoodItem', { item });
 });
 
-// Update handler
+// POST: Update food item
 router.post('/menu/edit/:id', async (req, res) => {
   const { foodName, category, price, ingredients, description, spiceLevel } = req.body;
   await MenuItem.findByIdAndUpdate(req.params.id, {
@@ -114,12 +139,11 @@ router.post('/menu/edit/:id', async (req, res) => {
   res.redirect('/owners/dashboard/menulisting');
 });
 
-// Delete handler
+// POST: Delete food item
 router.post('/menu/delete/:id', async (req, res) => {
   await MenuItem.findByIdAndDelete(req.params.id);
   req.flash('success', 'Food item deleted!');
   res.redirect('/owners/dashboard/menulisting');
 });
-
 
 module.exports = router;
