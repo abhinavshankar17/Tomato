@@ -61,39 +61,18 @@
 </head>
 <body>
   <div class="container">
+
     <div class="header">
-      <h2>Your Current Menu</h2>
-      <a href="/menu" class="btn btn-add">Add Food to Menu</a>
-    </div>
+  <h2>Your Current Menu</h2>
+  <div class="d-flex gap-2">
+    <a href="/owners/dashboard" class="btn btn-outline-danger">Back to Dashboard</a>
+    <a href="/menu" class="btn btn-add">Add Food to Menu</a>
+  </div>
+</div>
+
 
     <% if (menuItems && menuItems.length > 0) { %>
       <% menuItems.forEach(item => { %>
-        <!-- <div class="food-card">
-          <div class="food-info">
-            <img src="<%= item.imageUrl %>" alt="Food" class="food-img">
-            <div>
-              <h5><%= item.name %></h5>
-              <p class="mb-0"><strong>₹<%= item.price %></strong> | <%= item.category %></p>
-              <small>Ingredients: <%= item.ingredients %></small>
-            </div>
-          </div>
-          <div>
-            <form action="/menu/toggle-availability/<%= item._id %>" method="POST">
-  <div class="form-check form-switch">
-    <input 
-      class="form-check-input" 
-      type="checkbox" 
-      name="isAvailable" 
-      onchange="this.form.submit()" 
-      <%= item.isAvailable ? 'checked' : '' %>
-    >
-    <label class="form-check-label">
-      <%= item.isAvailable ? 'Available' : 'Unavailable' %>
-    </label>
-  </div>
-</form>
-          </div>
-        </div> -->
         <div class="food-card">
   <div class="food-info">
     <img src="<%= item.imageUrl %>" alt="Food" class="food-img">
