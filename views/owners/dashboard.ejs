@@ -90,6 +90,20 @@
       <p>Cuisine: <%= owner.cuisineType %></p>
       <hr />
       <p class="text-muted">Use the sidebar to manage your menu, track orders, and update your profile.</p>
+      <form action="/owners/toggle-live" method="POST" class="mt-3">
+  <div class="form-check form-switch">
+    <input 
+      class="form-check-input" 
+      type="checkbox" 
+      name="isLive" 
+      onchange="this.form.submit()" 
+      <%= owner.isLive ? 'checked' : '' %>>
+    <label class="form-check-label fw-semibold">
+      <%= owner.isLive ? 'Restaurant is LIVE (Visible to Customers)' : 'Restaurant is OFFLINE (Hidden)' %>
+    </label>
+  </div>
+</form>
+
     </div>
   </div>
 

@@ -8,7 +8,11 @@ const ownerSchema = new mongoose.Schema({
   restaurantName: String,
   restaurantPhone: String,
   restaurantAddress: String,
-  cuisineType: String
+  cuisineType: String,
+  isLive: {
+  type: Boolean,
+  default: false
+}
 });
 
 // Add username/password (we can use email as username)

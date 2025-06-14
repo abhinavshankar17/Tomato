@@ -6,7 +6,7 @@ const router = express.Router();
 const MenuItem = require('../models/menuItem');
 
 // Middleware to protect routes
-const { isLoggedIn } = require('../middleware/auth');
+const { isLoggedIn , isOwnerLoggedIn } = require('../middleware/auth');
 
 // =====================
 // OWNER REGISTRATION
@@ -62,6 +62,21 @@ router.post('/restregister', async (req, res, next) => {
     res.redirect('/owners/restregister');
   }
 });
+
+// LIVE: Toggle restaurant status
+router.post('/toggle-live', isOwnerLoggedIn, async (req, res) => {
+  try {
+    const owner = await Owner.findById(req.user._id);
+    owner.isLive = req.body.isLive === 'on'; // checkbox sends "on" when checked
+    await owner.save();
+    req.flash('success', 'Live status updated.');
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Unable to update live status.');
+  }
+  res.redirect('/owners/dashboard');
+});
+
 
 // =====================
 // LOGIN / LOGOUT
