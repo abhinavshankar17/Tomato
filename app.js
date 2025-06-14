@@ -20,6 +20,8 @@ const userController = require('./controllers/users');
 const ownerController = require('./controllers/owners');
 const ownerRoutes = require('./routes/owners');
 const menuRoutes = require('./routes/menu');
+const Restaurant = require('./models/owners'); 
+const MenuItem = require('./models/menuItem'); 
 
 // ------------------ MONGOOSE SETUP ------------------
 mongoose.connect('mongodb://localhost:27017/Tomato')
@@ -131,13 +133,45 @@ app.get('/owners/dashboard', (req, res) => {
 });
 
 // User Dashboard
-app.get('/main', (req, res) => res.render('main'));
+// app.get('/main', (req, res) => res.render('main'));
 
 // Static Restaurant Page
 app.get('/restaurant', (req, res) => res.render('restaurant'));
 
 // Menu Page (direct access)
 app.get('/menu', (req, res) => res.render('owners/menu'));
+
+// Main Page (for users to see online restaurants)
+app.get('/main', async (req, res) => {
+  try {
+    const onlineRestaurants = await Owner.find({ isLive: true });
+
+    res.render('main', {
+      currentUser: req.user,
+      onlineRestaurants
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading home page");
+  }
+});
+
+app.get('/restaurant/:id', async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findById(req.params.id);
+    const menuItems = await MenuItem.find({ owner: restaurant._id });
+
+    if (!restaurant) {
+      return res.status(404).send('Restaurant not found');
+    }
+
+    res.render('restaurantDetails', { restaurant, menuItems });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Something went wrong');
+  }
+});
+
 
 // Logout
 app.post('/logout', (req, res, next) => {

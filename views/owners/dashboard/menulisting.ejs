@@ -97,16 +97,23 @@
       </div>
     </form>
 
-    <!-- Update -->
-    <a href="/owners/menu/edit/<%= item._id %>" class="btn btn-sm btn-outline-primary mb-1">Edit</a>
+    <div class="d-flex flex-column align-items-stretch" style="width: 100px; padding-left: 1.5rem;">
+  <!-- Update -->
+  <a href="/owners/menu/edit/<%= item._id %>" 
+     class="btn btn-sm btn-outline-primary mb-1 w-75 text-center">
+    Edit
+  </a>
 
-    <!-- Delete -->
-    <form action="/owners/menu/delete/<%= item._id %>" method="POST">
-      <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this item?')">Delete</button>
-    </form>
+  <!-- Delete -->
+  <form action="/owners/menu/delete/<%= item._id %>" method="POST" class="w-100">
+    <button class="btn btn-sm btn-outline-danger w-75" 
+            onclick="return confirm('Are you sure you want to delete this item?')">
+      Delete
+    </button>
+  </form>
+</div>
   </div>
 </div>
-
       <% }) %>
     <% } else { %>
       <p>No food items added yet.</p>
