@@ -188,6 +188,7 @@
     
   </div>
 </div>
+<br>
 <div class="container text-center my-5">
   <h3 class="mb-4">Top Brands For You</h3>
   <br>
@@ -231,26 +232,48 @@
     
   </div>
 </div>
-<div>
-<% if (onlineRestaurants && onlineRestaurants.length > 0) { %>
-  <div class="container my-4">
-    <h4 class="text-success">Restaurants Currently Online</h4>
-    <ul class="list-group">
+<br>
+<!-- <div class="container my-5">
+  <% if (onlineRestaurants && onlineRestaurants.length > 0) { %>
+    <h3 class="mb-4" style="text-align: center;">Top Restaurants Near You</h3>
+    <div class="d-flex  justify-content-center flex-wrap gap-4">
+      <% onlineRestaurants.forEach(owner => { 
+        const firstItem = owner.menuItems && owner.menuItems.length > 0 ? owner.menuItems[0] : null;
+      %>
+        <div class="text-center">
+          <a href="/restaurant/<%= owner._id %>" class="text-decoration-none text-dark">
+            <img src="<%= owner.menuImage %>" alt="Menu Preview" class="rounded-circle" style="width: 100px; height: 100px;">
+            <div class="mt-2 fw-semibold"><%= owner.restaurantName %></div>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="text-center text-muted my-5">
+      <h5>No restaurants are currently online.</h5>
+    </div>
+  <% } %>
+</div> -->
+
+<div class="container my-5">
+  <% if (onlineRestaurants && onlineRestaurants.length > 0) { %>
+    <h3 class="mb-4 text-center">Top Restaurants Near You</h3>
+    <div class="d-flex justify-content-center flex-wrap gap-4">
       <% onlineRestaurants.forEach(owner => { %>
-  <li class="list-group-item">
-    <i class="bi bi-dot text-success"></i>
-    <a href="/restaurant/<%= owner._id %>" class="text-decoration-none">
-      <%= owner.restaurantName %>
-    </a>
-  </li>
-<% }) %>
-    </ul>
-  </div>
-<% } else { %>
-  <div class="container my-4">
-    <h5 class="text-muted">No restaurants are currently online.</h5>
-  </div>
-<% } %>
+        <div class="text-center">
+          <a href="/restaurant/<%= owner._id %>" class="text-decoration-none text-dark">
+            <img src="<%= owner.menuImage %>" alt="Menu Preview"
+              style="width: 250px; height: 220px; object-fit: cover; border-radius: 10px;">
+            <div class="mt-2 fw-semibold"><%= owner.restaurantName %></div>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="text-center text-muted my-5">
+      <h5>No restaurants are currently online.</h5>
+    </div>
+  <% } %>
 </div>
 
   <%- include('partials/footer') %>

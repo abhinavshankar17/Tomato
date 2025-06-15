@@ -142,13 +142,42 @@ app.get('/restaurant', (req, res) => res.render('restaurant'));
 app.get('/menu', (req, res) => res.render('owners/menu'));
 
 // Main Page (for users to see online restaurants)
+// app.get('/main', async (req, res) => {
+//   try {
+//     const onlineRestaurants = await Owner.find({ isLive: true });
+
+//     res.render('main', {
+//       currentUser: req.user,
+//       onlineRestaurants
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error loading home page");
+//   }
+// });
+
 app.get('/main', async (req, res) => {
   try {
     const onlineRestaurants = await Owner.find({ isLive: true });
 
+    // Attach one menu item (with image) for each restaurant
+    const restaurantsWithImages = await Promise.all(
+      onlineRestaurants.map(async (owner) => {
+        const item = await MenuItem.findOne({
+          owner: owner._id,
+          imageUrl: { $exists: true, $ne: '' },
+        });
+
+        return {
+          ...owner.toObject(),
+          menuImage: item?.imageUrl || null, // Add image if exists
+        };
+      })
+    );
+
     res.render('main', {
       currentUser: req.user,
-      onlineRestaurants
+      onlineRestaurants: restaurantsWithImages
     });
   } catch (err) {
     console.error(err);
