@@ -233,28 +233,7 @@
   </div>
 </div>
 <br>
-<!-- <div class="container my-5">
-  <% if (onlineRestaurants && onlineRestaurants.length > 0) { %>
-    <h3 class="mb-4" style="text-align: center;">Top Restaurants Near You</h3>
-    <div class="d-flex  justify-content-center flex-wrap gap-4">
-      <% onlineRestaurants.forEach(owner => { 
-        const firstItem = owner.menuItems && owner.menuItems.length > 0 ? owner.menuItems[0] : null;
-      %>
-        <div class="text-center">
-          <a href="/restaurant/<%= owner._id %>" class="text-decoration-none text-dark">
-            <img src="<%= owner.menuImage %>" alt="Menu Preview" class="rounded-circle" style="width: 100px; height: 100px;">
-            <div class="mt-2 fw-semibold"><%= owner.restaurantName %></div>
-          </a>
-        </div>
-      <% }) %>
-    </div>
-  <% } else { %>
-    <div class="text-center text-muted my-5">
-      <h5>No restaurants are currently online.</h5>
-    </div>
-  <% } %>
-</div> -->
-
+<% if (currentUser) { %>
 <div class="container my-5">
   <% if (onlineRestaurants && onlineRestaurants.length > 0) { %>
     <h3 class="mb-4 text-center">Top Restaurants Near You</h3>
@@ -275,6 +254,7 @@
     </div>
   <% } %>
 </div>
+<% } %>
 
   <%- include('partials/footer') %>
 

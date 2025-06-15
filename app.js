@@ -141,20 +141,7 @@ app.get('/restaurant', (req, res) => res.render('restaurant'));
 // Menu Page (direct access)
 app.get('/menu', (req, res) => res.render('owners/menu'));
 
-// Main Page (for users to see online restaurants)
-// app.get('/main', async (req, res) => {
-//   try {
-//     const onlineRestaurants = await Owner.find({ isLive: true });
 
-//     res.render('main', {
-//       currentUser: req.user,
-//       onlineRestaurants
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Error loading home page");
-//   }
-// });
 
 app.get('/main', async (req, res) => {
   try {
@@ -200,6 +187,53 @@ app.get('/restaurant/:id', async (req, res) => {
     res.status(500).send('Something went wrong');
   }
 });
+
+
+//the below code might be helpful in future
+
+// app.get('/checkout', async (req, res) => {
+//   const cart = req.session.cart || [];
+//   const summary = [];
+
+//   for (const cartItem of cart) {
+//     const item = await MenuItem.findById(cartItem.itemId);
+//     if (item) {
+//       summary.push({
+//         name: item.name,
+//         quantity: cartItem.quantity,
+//         total: cartItem.quantity * item.price,
+//         imageUrl: item.imageUrl 
+//       });
+//     }
+//   }
+
+//   const totalAmount = summary.reduce((acc, curr) => acc + curr.total, 0);
+//   console.log('Checkout Summary:', summary);
+
+//   res.render('checkout', { summary, totalAmount });
+// });
+
+
+// Checkout route
+
+app.post('/checkout', async (req, res) => {
+  const cart = JSON.parse(req.body.cart); // { itemId: quantity }
+  const menuItems = await MenuItem.find({ _id: { $in: Object.keys(cart) } });
+
+  const summary = menuItems.map(item => ({
+  name: item.name,
+  price: item.price,
+  quantity: cart[item._id],
+  total: item.price * cart[item._id],
+  imageUrl: item.imageUrl 
+}));
+
+
+  const totalAmount = summary.reduce((sum, item) => sum + item.total, 0);
+
+  res.render('checkout', { summary, totalAmount });
+});
+
 
 
 // Logout
