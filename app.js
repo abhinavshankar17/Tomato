@@ -22,6 +22,7 @@ const ownerRoutes = require('./routes/owners');
 const menuRoutes = require('./routes/menu');
 const Restaurant = require('./models/owners'); 
 const MenuItem = require('./models/menuItem'); 
+const Order = require('./models/order'); // Import Order model
 
 // ------------------ MONGOOSE SETUP ------------------
 mongoose.connect('mongodb://localhost:27017/Tomato')
@@ -32,6 +33,7 @@ mongoose.connect('mongodb://localhost:27017/Tomato')
 // Static files and parsing
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // View engine
 app.use(expressLayouts);
@@ -233,6 +235,124 @@ app.post('/checkout', async (req, res) => {
 
   res.render('checkout', { summary, totalAmount });
 });
+
+// app.post('/order/confirm', async (req, res) => {
+//   try {
+//     console.log("Raw body:", req.body); // Debug
+
+//     const summary = JSON.parse(req.body.orderSummary);
+//     const totalAmount = req.body.totalAmount;
+
+//     console.log("Parsed summary:", summary);
+//     console.log("Total amount:", totalAmount);
+
+//     // Save to DB or perform further logic
+//     res.send("Order confirmed!");
+//   } catch (err) {
+//     console.error("Error parsing order summary:", err);
+//     res.status(400).send("Invalid order data");
+//   }
+// });
+
+
+// Confirm Order route
+// app.post('/order/confirm', async (req, res) => {
+//   try {
+//     const summary = JSON.parse(req.body.orderSummary);
+//     const totalAmount = req.body.totalAmount;
+
+//     if (!summary || !Array.isArray(summary) || summary.length === 0) {
+//       throw new Error('Invalid order summary data.');
+//     }
+
+//     // Get restaurant ID from the first menu item
+//     const menuItem = await MenuItem.findOne({ name: summary[0].name });
+//     if (!menuItem) throw new Error('Menu item not found.');
+
+//     const restaurantId = menuItem.owner; // owner is the restaurant (from MenuItem schema)
+
+//     const newOrder = new Order({
+//       restaurant: restaurantId,
+//       customer: req.user._id,
+//       items: summary.map(item => ({
+//         name: item.name,
+//         quantity: item.quantity,
+//         price: item.total // Assuming 'total' is item-wise total
+//       })),
+//       totalAmount
+//     });
+
+//     await newOrder.save();
+
+//     req.flash('success', 'Order confirmed!');
+//     res.redirect('/order/confirmed');
+//   } catch (err) {
+//     console.error('Error confirming order:', err);
+//     req.flash('error', 'Invalid order data');
+//     res.redirect('/checkout');
+//   }
+// });
+app.post('/order/confirm', async (req, res) => {
+  try {
+    const summary = JSON.parse(req.body.orderSummary);
+    const totalAmount = req.body.totalAmount;
+    const customerId = req.user._id;
+
+    // Find restaurant owner from one of the items (assuming all items belong to same restaurant)
+    const firstItem = summary[0];
+    const menuItem = await MenuItem.findOne({ name: firstItem.name }).populate('owner');
+    if (!menuItem || !menuItem.owner) {
+      console.error('Owner not found for menu item:', firstItem.name);
+      return res.status(400).send('Invalid order data');
+    }
+
+    const newOrder = new Order({
+      restaurant: menuItem.owner._id,
+      items: summary.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.total
+      })),
+      totalAmount,
+      customer: customerId
+    });
+
+    await newOrder.save();
+
+    // Show confirmation and auto-redirect to /main
+    res.send(`
+      <html>
+        <head>
+          <meta http-equiv="refresh" content="2;url=/main" />
+          <style>
+            body {
+              display: flex;
+              height: 100vh;
+              align-items: center;
+              justify-content: center;
+              font-family: sans-serif;
+              background-color: #f8f9fa;
+            }
+            .message {
+              font-size: 1.5rem;
+              color: #28a745;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="message">✅ Order Confirmed! Redirecting to home...</div>
+        </body>
+      </html>
+    `);
+
+  } catch (err) {
+    console.error("Error confirming order:", err);
+    res.status(500).send('Failed to confirm order');
+  }
+});
+
+
+
 
 
 

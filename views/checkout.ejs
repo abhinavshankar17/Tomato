@@ -64,7 +64,7 @@
       </div>
 
       <form action="/order/confirm" method="POST" class="mt-4 text-center">
-        <input type="hidden" name="orderSummary" value='<%- JSON.stringify(summary) %>' />
+      <input type="hidden" name="orderSummary" value="<%- JSON.stringify(summary).replace(/"/g, '&quot;') %>">
         <input type="hidden" name="totalAmount" value="<%= totalAmount %>" />
         <button type="submit" class="btn btn-confirm px-4">Confirm Order</button>
       </form>

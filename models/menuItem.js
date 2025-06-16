@@ -1,6 +1,4 @@
-
 const mongoose = require('mongoose');
-const { type } = require('os');
 
 const menuItemSchema = new mongoose.Schema({
   name: String,
@@ -11,10 +9,14 @@ const menuItemSchema = new mongoose.Schema({
   spiceLevel: String,
   isAvailable: {
     type: Boolean,
-    default: true // Default value for isAvailable
+    default: true // Default value for availability
   },
   imageUrl: String,
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // ✅ required
+  owner: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Owner', // ✅ Corrected reference
+    required: true 
+  }
 });
 
 module.exports = mongoose.model('MenuItem', menuItemSchema);

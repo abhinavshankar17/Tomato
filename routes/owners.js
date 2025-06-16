@@ -4,6 +4,8 @@ const passport = require('passport');
 const Owner = require('../models/owners');
 const router = express.Router();
 const MenuItem = require('../models/menuItem');
+const Order = require('../models/order'); 
+
 
 // Middleware to protect routes
 const { isLoggedIn , isOwnerLoggedIn } = require('../middleware/auth');
@@ -38,7 +40,7 @@ router.post('/restregister', async (req, res, next) => {
       return res.redirect('/owners/restregister');
     }
 
-    // ✅ Explicitly assign username (required by passport-local-mongoose)
+  
     const newOwner = new Owner({
       username: ownerEmail,
       ownerEmail,
@@ -153,6 +155,28 @@ router.post('/menu/edit/:id', async (req, res) => {
   req.flash('success', 'Food item updated!');
   res.redirect('/owners/dashboard/menulisting');
 });
+
+
+router.get('/orders', async (req, res) => {
+  if (!req.isAuthenticated() || !(req.user instanceof Owner)) {
+    req.flash('error', 'Login as an owner to view orders.');
+    return res.redirect('/owners/restlogin');
+  }
+
+  try {
+    const orders = await Order.find({ restaurant: req.user._id })
+      .populate('customer') // optional, if you want customer info
+      .populate('restaurant'); // optional, if you want restaurant info
+
+    res.render('owners/orders', { orders });
+  } catch (err) {
+    console.error('Error fetching owner orders:', err);
+    req.flash('error', 'Could not fetch orders.');
+    res.redirect('/owners/dashboard');
+  }
+});
+
+
 
 // POST: Delete food item
 router.post('/menu/delete/:id', async (req, res) => {
