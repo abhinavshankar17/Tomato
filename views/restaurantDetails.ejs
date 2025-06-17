@@ -131,37 +131,18 @@
   </style>
 </head>
 <body>
-<!-- 
-  <div class="container my-5" style="width: 75rem;">
-     <button onclick="history.back()" class="btn btn-outline-secondary mb-4">&larr; Back</button>
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger">
+    <%= error[0] %>
+  </div>
+<% } %>
 
-    <h2 class="mb-3"><%= restaurant.restaurantName %></h2>
-    <p class="text-muted">Welcome! Here's our delicious menu.</p>
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success">
+    <%= success[0] %>
+  </div>
+<% } %>
 
-    <% if (menuItems.length > 0) { %>
-      <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
-        <% menuItems.forEach(item => { %>
-          <div class="col">
-            <div class="card h-100 shadow-sm">
-              <img src="<%= item.imageUrl %>" class="card-img-top menu-card-img" alt="<%= item.name %>">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title"><%= item.name %></h5>
-                <p class="card-text text-muted"><%= item.description %></p>
-                <p class="card-price">₹<%= item.price %></p>
-                <form action="/cart/add/<%= item._id %>" method="POST" class="mt-auto">
-                  <button type="submit" class="btn btn-custom-red w-100">Add to Cart</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    <% } else { %>
-      <div class="alert alert-info text-center mt-4">
-        No menu items available for this restaurant.
-      </div>
-    <% } %>
-  </div> -->
 <div class="container my-5" style="width: 75rem;">
   <a href="/main" class="btn btn-outline-secondary mb-4">&larr; Back</a>
 
@@ -215,8 +196,29 @@
   const checkoutBar = document.getElementById('checkoutBar');
 
   addToCartButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const id = btn.getAttribute('data-id');
+
+      // Send POST to backend
+      try {
+        const response = await fetch(`/menu/add-to-cart/${id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ quantity: 1 })
+        });
+
+        if (!response.ok) {
+          alert('Failed to add item to cart.');
+          return;
+        }
+      } catch (err) {
+        console.error('Add to cart failed:', err);
+        alert('An error occurred while adding item to cart.');
+        return;
+      }
+
       cart[id] = 1;
 
       const cardBody = btn.closest('.card-body');
@@ -276,6 +278,7 @@
     checkoutBar.style.display = totalItems > 0 ? 'flex' : 'none';
   }
 </script>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -47,6 +47,50 @@ router.post('/toggle-availability/:id', isLoggedIn, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+// Route to add item to session cart
+router.post('/add-to-cart/:id', async (req, res) => {
+  const itemId = req.params.id;
+  const quantity = parseInt(req.body.quantity) || 1;
+
+  try {
+    const menuItem = await MenuItem.findById(itemId).populate('owner');
+
+    if (!menuItem) {
+      req.flash('error', 'Item not found.');
+      return res.redirect('/main');
+    }
+
+    req.session.cart = req.session.cart || [];
+
+    // Check if all items are from same restaurant
+    if (
+      req.session.cart.length > 0 &&
+      req.session.cart[0].owner.toString() !== menuItem.owner._id.toString()
+    ) {
+      req.flash('error', 'You can only order from one restaurant at a time.');
+      return res.redirect('/main');
+    }
+
+    // Push item to cart
+    req.session.cart.push({
+      itemId: menuItem._id,
+      name: menuItem.name,
+      quantity,
+      price: menuItem.price,
+      total: menuItem.price * quantity,
+      imageUrl: menuItem.imageUrl,
+      owner: menuItem.owner._id
+    });
+
+    req.flash('success', 'Item added to cart!');
+    res.redirect('/main');
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Something went wrong.');
+    res.redirect('/main');
+  }
+});
+
 
 console.log('menu.js loaded successfully');
 

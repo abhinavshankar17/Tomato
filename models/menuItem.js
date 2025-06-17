@@ -14,7 +14,7 @@ const menuItemSchema = new mongoose.Schema({
   imageUrl: String,
   owner: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Owner', // ✅ Corrected reference
+    ref: 'Owner', 
     required: true 
   }
 });

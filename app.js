@@ -215,99 +215,55 @@ app.get('/restaurant/:id', async (req, res) => {
 //   res.render('checkout', { summary, totalAmount });
 // });
 
-
-// Checkout route
-
 app.post('/checkout', async (req, res) => {
-  const cart = JSON.parse(req.body.cart); // { itemId: quantity }
-  const menuItems = await MenuItem.find({ _id: { $in: Object.keys(cart) } });
+  try {
+    const summary = req.session.cart || [];
 
-  const summary = menuItems.map(item => ({
-  name: item.name,
-  price: item.price,
-  quantity: cart[item._id],
-  total: item.price * cart[item._id],
-  imageUrl: item.imageUrl 
-}));
+    if (summary.length === 0) {
+      req.flash('error', 'Cart is empty.');
+      return res.redirect('/main');
+    }
 
+    const totalAmount = summary.reduce((acc, item) => acc + item.total, 0);
+    const firstItem = summary[0];
 
-  const totalAmount = summary.reduce((sum, item) => sum + item.total, 0);
+    if (!firstItem || !firstItem.owner) {
+      req.flash('error', 'Restaurant info missing from cart');
+      return res.redirect('/main');
+    }
 
-  res.render('checkout', { summary, totalAmount });
+    const restaurant = await Owner.findById(firstItem.owner);
+
+    if (!restaurant) {
+      req.flash('error', 'Invalid restaurant.');
+      return res.redirect('/main');
+    }
+
+    res.render('checkout', { summary, totalAmount, restaurant });
+  } catch (err) {
+    console.error('Checkout error:', err);
+    req.flash('error', 'Could not load checkout page.');
+    res.redirect('/main');
+  }
 });
-
-// app.post('/order/confirm', async (req, res) => {
-//   try {
-//     console.log("Raw body:", req.body); // Debug
-
-//     const summary = JSON.parse(req.body.orderSummary);
-//     const totalAmount = req.body.totalAmount;
-
-//     console.log("Parsed summary:", summary);
-//     console.log("Total amount:", totalAmount);
-
-//     // Save to DB or perform further logic
-//     res.send("Order confirmed!");
-//   } catch (err) {
-//     console.error("Error parsing order summary:", err);
-//     res.status(400).send("Invalid order data");
-//   }
-// });
 
 
 // Confirm Order route
-// app.post('/order/confirm', async (req, res) => {
-//   try {
-//     const summary = JSON.parse(req.body.orderSummary);
-//     const totalAmount = req.body.totalAmount;
 
-//     if (!summary || !Array.isArray(summary) || summary.length === 0) {
-//       throw new Error('Invalid order summary data.');
-//     }
-
-//     // Get restaurant ID from the first menu item
-//     const menuItem = await MenuItem.findOne({ name: summary[0].name });
-//     if (!menuItem) throw new Error('Menu item not found.');
-
-//     const restaurantId = menuItem.owner; // owner is the restaurant (from MenuItem schema)
-
-//     const newOrder = new Order({
-//       restaurant: restaurantId,
-//       customer: req.user._id,
-//       items: summary.map(item => ({
-//         name: item.name,
-//         quantity: item.quantity,
-//         price: item.total // Assuming 'total' is item-wise total
-//       })),
-//       totalAmount
-//     });
-
-//     await newOrder.save();
-
-//     req.flash('success', 'Order confirmed!');
-//     res.redirect('/order/confirmed');
-//   } catch (err) {
-//     console.error('Error confirming order:', err);
-//     req.flash('error', 'Invalid order data');
-//     res.redirect('/checkout');
-//   }
-// });
 app.post('/order/confirm', async (req, res) => {
   try {
     const summary = JSON.parse(req.body.orderSummary);
     const totalAmount = req.body.totalAmount;
+    const restaurantId = req.body.restaurantId;
     const customerId = req.user._id;
 
-    // Find restaurant owner from one of the items (assuming all items belong to same restaurant)
-    const firstItem = summary[0];
-    const menuItem = await MenuItem.findOne({ name: firstItem.name }).populate('owner');
-    if (!menuItem || !menuItem.owner) {
-      console.error('Owner not found for menu item:', firstItem.name);
-      return res.status(400).send('Invalid order data');
+    if (!restaurantId || !summary || summary.length === 0) {
+      req.flash('error', 'Invalid order data');
+      return res.redirect('/main');
     }
 
     const newOrder = new Order({
-      restaurant: menuItem.owner._id,
+      restaurant: restaurantId,
       items: summary.map(item => ({
         name: item.name,
         quantity: item.quantity,
@@ -319,28 +275,12 @@ app.post('/order/confirm', async (req, res) => {
 
     await newOrder.save();
 
-    // Show confirmation and auto-redirect to /main
+    // Success
     res.send(`
       <html>
-        <head>
-          <meta http-equiv="refresh" content="2;url=/main" />
-          <style>
-            body {
-              display: flex;
-              height: 100vh;
-              align-items: center;
-              justify-content: center;
-              font-family: sans-serif;
-              background-color: #f8f9fa;
-            }
-            .message {
-              font-size: 1.5rem;
-              color: #28a745;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="message">✅ Order Confirmed! Redirecting to home...</div>
+        <head><meta http-equiv="refresh" content="2;url=/main" /></head>
+        <body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f8f9fa;font-family:sans-serif;">
+          <div class="message" style="font-size:1.5rem;color:#28a745;">✅ Order Confirmed! Redirecting...</div>
         </body>
       </html>
     `);
@@ -350,6 +290,7 @@ app.post('/order/confirm', async (req, res) => {
     res.status(500).send('Failed to confirm order');
   }
 });
+
 
 
 
