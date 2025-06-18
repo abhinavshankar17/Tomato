@@ -228,10 +228,16 @@ app.post('/checkout', async (req, res) => {
 
     const summary = req.session.cart || [];
 
+    // if (summary.length === 0) {
+    //   req.flash('error', 'Cart is empty.');
+    //   return res.redirect(`/restaurant/<% owner._id %>`);
+
+    // }
     if (summary.length === 0) {
-      req.flash('error', 'Cart is empty.');
-      return res.redirect('/restaurantDetails');
-    }
+  req.flash('error', 'Cart is empty.');
+  return res.redirect(`/restaurant/${firstItem.owner}`);
+}
+
 
     const totalAmount = summary.reduce((acc, item) => acc + item.total, 0);
     const firstItem = summary[0];
