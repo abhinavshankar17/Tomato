@@ -266,6 +266,48 @@ app.post('/checkout', async (req, res) => {
 
 // Confirm Order route
 
+// app.post('/order/confirm', async (req, res) => {
+//   try {
+//     const summary = JSON.parse(req.body.orderSummary);
+//     const totalAmount = req.body.totalAmount;
+//     const restaurantId = req.body.restaurantId;
+//     const customerId = req.user._id;
+
+//     if (!restaurantId || !summary || summary.length === 0) {
+//       req.flash('error', 'Invalid order data');
+//       return res.redirect('/main');
+//     }
+
+//     const newOrder = new Order({
+//       restaurant: restaurantId,
+//       items: summary.map(item => ({
+//         name: item.name,
+//         quantity: item.quantity,
+//         price: item.total
+//       })),
+//       totalAmount,
+//       customer: customerId
+//     });
+
+//     await newOrder.save();
+
+//     // Clear the cart after order is confirmed
+//     req.session.cart = [];
+
+//     res.send(`
+//       <html>
+//         <head><meta http-equiv="refresh" content="2;url=/main" /></head>
+//         <body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f8f9fa;font-family:sans-serif;">
+//           <div class="message" style="font-size:1.5rem;color:#28a745;">✅ Order Confirmed! Redirecting...</div>
+//         </body>
+//       </html>
+//     `);
+
+//   } catch (err) {
+//     console.error("Error confirming order:", err);
+//     res.status(500).send('Failed to confirm order');
+//   }
+// });
 app.post('/order/confirm', async (req, res) => {
   try {
     const summary = JSON.parse(req.body.orderSummary);
@@ -291,27 +333,46 @@ app.post('/order/confirm', async (req, res) => {
 
     await newOrder.save();
 
-    // Clear the cart after order is confirmed
+    //  Clear the cart after order is confirmed
     req.session.cart = [];
 
-    res.send(`
-      <html>
-        <head><meta http-equiv="refresh" content="2;url=/main" /></head>
-        <body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f8f9fa;font-family:sans-serif;">
-          <div class="message" style="font-size:1.5rem;color:#28a745;">✅ Order Confirmed! Redirecting...</div>
-        </body>
-      </html>
-    `);
+    //  Flash a success message and redirect to /myorders
+    req.flash('success', '✅ Order Confirmed!');
+    res.redirect('/myorders');
 
   } catch (err) {
     console.error("Error confirming order:", err);
-    res.status(500).send('Failed to confirm order');
+    req.flash('error', 'Failed to confirm order.');
+    res.redirect('/main');
   }
 });
 
 
+app.get('/myorders', async (req, res) => {
+  try {
+    const orders = await Order.find({ customer: req.user._id }).sort({ createdAt: -1 });
+    res.render('myorders', { orders });
+  } catch (err) {
+    console.error('Error fetching user orders:', err);
+    req.flash('error', 'Could not load your orders.');
+    res.redirect('/main');
+  }
+});
 
 
+app.get('/api/myorders', async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Not authorized' });
+  }
+
+  try {
+    const orders = await Order.find({ customer: req.user._id }).populate('restaurant');
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching user orders:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 
