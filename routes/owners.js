@@ -157,6 +157,24 @@ router.post('/menu/edit/:id', async (req, res) => {
 });
 
 
+// router.get('/orders', async (req, res) => {
+//   if (!req.isAuthenticated() || !(req.user instanceof Owner)) {
+//     req.flash('error', 'Login as an owner to view orders.');
+//     return res.redirect('/owners/restlogin');
+//   }
+
+//   try {
+//     const orders = await Order.find({ restaurant: req.user._id })
+//       .populate('customer') // optional, if you want customer info
+//       .populate('restaurant'); // optional, if you want restaurant info
+
+//     res.render('owners/orders', { orders });
+//   } catch (err) {
+//     console.error('Error fetching  orders:', err);
+//     req.flash('error', 'Could not fetch orders.');
+//     res.redirect('/owners/dashboard');
+//   }
+// });
 router.get('/orders', async (req, res) => {
   if (!req.isAuthenticated() || !(req.user instanceof Owner)) {
     req.flash('error', 'Login as an owner to view orders.');
@@ -164,18 +182,50 @@ router.get('/orders', async (req, res) => {
   }
 
   try {
-    const orders = await Order.find({ restaurant: req.user._id })
-      .populate('customer') // optional, if you want customer info
-      .populate('restaurant'); // optional, if you want restaurant info
+    const orders = await Order.find({ restaurant: req.user._id }).sort({ createdAt: -1 });
+    const getNextStatus = (currentStatus) => {
+      const statusFlow = ['Pending', 'Confirmed', 'Ready to Pick Up', 'Out for Delivery', 'Completed'];
+      const index = statusFlow.indexOf(currentStatus);
+      return index >= 0 && index < statusFlow.length - 1 ? statusFlow[index + 1] : currentStatus;
+    };
 
-    res.render('owners/orders', { orders });
+    res.render('owners/orders', { orders, getNextStatus });
   } catch (err) {
-    console.error('Error fetching owner orders:', err);
+    console.error('Error fetching orders:', err);
     req.flash('error', 'Could not fetch orders.');
     res.redirect('/owners/dashboard');
   }
 });
 
+
+
+router.post('/orders/update-status/:id', async (req, res) => {
+  if (!req.isAuthenticated() || !(req.user instanceof Owner)) {
+    req.flash('error', 'Unauthorized');
+    return res.redirect('/owners/restlogin');
+  }
+
+  try {
+    const order = await Order.findById(req.params.id);
+    const statusFlow = ['Pending', 'Confirmed', 'Ready to Pick Up', 'Out for Delivery', 'Completed'];
+    const index = statusFlow.indexOf(order.status);
+
+
+    if (index !== -1 && index < statusFlow.length - 1) {
+      order.status = statusFlow[index + 1];
+      await order.save();
+      
+    } else {
+      console.log('Status not in flow or already completed');
+    }
+
+    return res.redirect('/owners/orders');
+  } catch (err) {
+    console.error('ERROR updating status:', err);
+    req.flash('error', 'Failed to update order status.');
+    return res.redirect('/owners/orders');
+  }
+});
 
 
 // POST: Delete food item

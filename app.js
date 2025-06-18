@@ -217,11 +217,20 @@ app.get('/restaurant/:id', async (req, res) => {
 
 app.post('/checkout', async (req, res) => {
   try {
+    // OPTIONAL: If you want to start fresh when coming from a new restaurant
+    const restaurantId = req.body.restaurantId;
+    if (restaurantId && req.session.cart && req.session.cart.length > 0) {
+      const existingOwner = req.session.cart[0]?.owner?.toString();
+      if (existingOwner && existingOwner !== restaurantId) {
+        req.session.cart = []; // Clear if restaurant changed
+      }
+    }
+
     const summary = req.session.cart || [];
 
     if (summary.length === 0) {
       req.flash('error', 'Cart is empty.');
-      return res.redirect('/main');
+      return res.redirect('/restaurantDetails');
     }
 
     const totalAmount = summary.reduce((acc, item) => acc + item.total, 0);
@@ -246,6 +255,7 @@ app.post('/checkout', async (req, res) => {
     res.redirect('/main');
   }
 });
+
 
 
 // Confirm Order route
@@ -275,7 +285,9 @@ app.post('/order/confirm', async (req, res) => {
 
     await newOrder.save();
 
-    // Success
+    // Clear the cart after order is confirmed
+    req.session.cart = [];
+
     res.send(`
       <html>
         <head><meta http-equiv="refresh" content="2;url=/main" /></head>

@@ -181,6 +181,16 @@
     </div>
   <% } %>
 </div>
+<div>
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success"><%= success[0] %></div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger"><%= error[0] %></div>
+<% } %>
+</div>
+
 
 <!-- Checkout Bar -->
 <div class="checkout-bar d-flex" id="checkoutBar">

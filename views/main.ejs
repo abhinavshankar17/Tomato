@@ -145,6 +145,17 @@
 </div>
 <br>
 <br>
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger">
+    <%= error[0] %>
+  </div>
+<% } %>
+
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success">
+    <%= success[0] %>
+  </div>
+<% } %>
 <div class="container text-center my-5">
   <h3 class="mb-4">Inspiration for your first order</h3>
   <br>
