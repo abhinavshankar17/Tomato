@@ -52,48 +52,49 @@
   <main class="container mt-5" style="padding-top: 10rem;">
     <h1>Order delivery near you</h1>
   </main>
-   <div style="display: flex; margin-bottom: 2rem;">
-<div class="container mt-4">
-  <div class="d-flex flex-wrap align-items-center bg-white rounded-pill shadow-sm p-2" style="max-width: 100%; border: 2px solid #000000;">
-    
-    <!-- Delivery Address -->
-    <div class="d-flex align-items-center flex-grow-1 px-3">
-      <i class="bi bi-geo-alt-fill me-2 fs-5"></i>
-      <input type="text" class="form-control border-0" placeholder="Enter your city" style="box-shadow: none;">
-    </div>
+  <div style="display: flex; margin-bottom: 2rem;">
+  <div class="container mt-4">
+    <form action="/save-city" method="POST" class="d-flex flex-wrap align-items-center bg-white rounded-pill shadow-sm p-2" style="max-width: 100%; border: 2px solid #000000;">
+      
+      <!-- Delivery Address -->
+      <div class="d-flex align-items-center flex-grow-1 px-3">
+        <i class="bi bi-geo-alt-fill me-2 fs-5"></i>
+        <input type="text" name="city" class="form-control border-0" placeholder="Enter your city" style="box-shadow: none;">
+      </div>
 
-    <div class="vr mx-2" style="height: 30px;"></div>
+      <div class="vr mx-2" style="height: 30px;"></div>
 
-    <!-- Delivery Time Dropdown -->
-    <div class="dropdown px-3">
-      <button class="btn bg-white dropdown-toggle d-flex align-items-center fw-semibold border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="deliveryDropdown">
-        <i class="bi bi-clock-fill me-2 fs-5"></i>
-        <span id="selectedDeliveryOption">Deliver now</span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="deliveryDropdown">
-        <li><a class="dropdown-item" href="#" onclick="setDeliverNow()">Deliver now</a></li>
-        <li><a class="dropdown-item" href="#" onclick="showScheduleOptions()">Schedule later</a></li>
-        <li>
-          <div id="scheduleOptions" class="px-3 pt-2" style="display: none; min-width: 250px;">
-            <label for="dateSelect" class="form-label fw-semibold">Select Date:</label>
-            <select id="dateSelect" class="form-select mb-2" onchange="populateTimeSlots()"></select>
+      <!-- Delivery Time Dropdown -->
+      <div class="dropdown px-3">
+        <button class="btn bg-white dropdown-toggle d-flex align-items-center fw-semibold border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="deliveryDropdown">
+          <i class="bi bi-clock-fill me-2 fs-5"></i>
+          <span id="selectedDeliveryOption">Deliver now</span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="deliveryDropdown">
+          <li><a class="dropdown-item" href="#" onclick="setDeliverNow()">Deliver now</a></li>
+          <li><a class="dropdown-item" href="#" onclick="showScheduleOptions()">Schedule later</a></li>
+          <li>
+            <div id="scheduleOptions" class="px-3 pt-2" style="display: none; min-width: 250px;">
+              <label for="dateSelect" class="form-label fw-semibold">Select Date:</label>
+              <select id="dateSelect" class="form-select mb-2" onchange="populateTimeSlots()"></select>
 
-            <label for="timeSelect" class="form-label fw-semibold">Select Time:</label>
-            <select id="timeSelect" class="form-select mb-2"></select>
+              <label for="timeSelect" class="form-label fw-semibold">Select Time:</label>
+              <select id="timeSelect" class="form-select mb-2"></select>
 
-            <button class="btn btn-sm btn-primary mt-2" onclick="applyScheduledTime()">Set Time</button>
-          </div>
-        </li>
-      </ul>
-    </div>
+              <button class="btn btn-sm btn-primary mt-2" type="button" onclick="applyScheduledTime()">Set Time</button>
+            </div>
+          </li>
+        </ul>
+      </div>
 
-    <!-- Search Button -->
-    <div class="ms-3">
-      <button onclick="window.location.href='/main'" class="btn btn-dark rounded-pill px-4">Search here</button>
-    </div>
+      <!-- Search Button -->
+      <div class="ms-3">
+        <button type="submit" class="btn btn-dark rounded-pill px-4">Search here</button>
+      </div>
+    </form>
   </div>
 </div>
-</div>
+
 <br>
 <br>
 <hr>
