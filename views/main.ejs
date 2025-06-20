@@ -168,6 +168,29 @@
 <% } %>
 
 
+<% if (currentUser && city) { %>
+<div class="container my-5">
+  <% if (onlineRestaurants && onlineRestaurants.length > 0) { %>
+    <h3 class="mb-4 text-center">Top Restaurants Near You</h3>
+    <div class="d-flex justify-content-center flex-wrap gap-4">
+      <% onlineRestaurants.forEach(owner => { %>
+        <div class="text-center">
+          <a href="/restaurant/<%= owner._id %>" class="text-decoration-none text-dark">
+            <img src="<%= owner.menuImage %>" alt="Menu Preview"
+              style="width: 250px; height: 220px; object-fit: cover; border-radius: 10px;">
+            <div class="mt-2 fw-semibold"><%= owner.restaurantName %></div>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="text-center text-muted my-5">
+      <h5>No restaurants are currently online.</h5>
+    </div>
+  <% } %>
+</div>
+<% } %>
+<br>
 <div class="container text-center my-5">
   <h3 class="mb-4">Inspiration for your first order</h3>
   <br>
@@ -211,30 +234,6 @@
     
   </div>
 </div>
-<br>
-<br>
-<% if (currentUser) { %>
-<div class="container my-5">
-  <% if (onlineRestaurants && onlineRestaurants.length > 0) { %>
-    <h3 class="mb-4 text-center">Top Restaurants Near You</h3>
-    <div class="d-flex justify-content-center flex-wrap gap-4">
-      <% onlineRestaurants.forEach(owner => { %>
-        <div class="text-center">
-          <a href="/restaurant/<%= owner._id %>" class="text-decoration-none text-dark">
-            <img src="<%= owner.menuImage %>" alt="Menu Preview"
-              style="width: 250px; height: 220px; object-fit: cover; border-radius: 10px;">
-            <div class="mt-2 fw-semibold"><%= owner.restaurantName %></div>
-          </a>
-        </div>
-      <% }) %>
-    </div>
-  <% } else { %>
-    <div class="text-center text-muted my-5">
-      <h5>No restaurants are currently online.</h5>
-    </div>
-  <% } %>
-</div>
-<% } %>
 <br>
 <div class="container text-center my-5">
   <h3 class="mb-4">Top Brands For You</h3>
