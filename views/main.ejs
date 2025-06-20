@@ -18,6 +18,12 @@
 <body >
 
   <!-- Uber Eats Style Navbar -->
+   <% if (currentUser) { %>
+<script>
+  localStorage.removeItem('city');
+</script>
+<% } %>
+
    
   <nav class="navbar navbar-expand-lg";>
     <div class="container-fluid d-flex justify-content-between align-items-center px-4 py-2">
