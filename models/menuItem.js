@@ -9,13 +9,21 @@ const menuItemSchema = new mongoose.Schema({
   spiceLevel: String,
   isAvailable: {
     type: Boolean,
-    default: true // Default value for availability
+    default: true
   },
   imageUrl: String,
   owner: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Owner', 
     required: true 
+  },
+  rating: {
+    type: Number,
+    default: 0
+  },
+  numRatings: {
+    type: Number,
+    default: 0
   }
 });
 

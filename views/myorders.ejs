@@ -98,28 +98,91 @@
   <div class="container orders-container">
     <h2 class="text-center mb-4 text-danger">My Orders</h2>
 
+    <div id="ordersList">
+
     <% if (orders.length > 0) { %>
-      <% orders.forEach(order => { %>
-        <div class="order-card">
-          <div class="status-badge status-<%= order.status.replace(/ /g, '\\ ') %>"><%= order.status %></div>
-          <h5>Order #<%= order._id %></h5>
-          <ul>
-            <% order.items.forEach(item => { %>
-              <li><%= item.name %> x <%= item.quantity %> — ₹<%= item.price %></li>
-            <% }) %>
-          </ul>
-          <p><strong>Total:</strong> ₹<%= order.totalAmount %></p>
-          <p><strong>Ordered At:</strong> <%= order.createdAt.toLocaleString() %></p>
-        </div>
-      <% }) %>
+  <% orders.forEach(order => { %>
+    <div class="order-card">
+      <div class="status-badge status-<%= order.status.replace(/ /g, '\\ ') %>"><%= order.status %></div>
+      <h5>Order #<%= order._id %></h5>
+      <ul>
+        <% order.items.forEach(item => { %>
+          <li><%= item.name %> x <%= item.quantity %> — ₹<%= item.price %></li>
+        <% }) %>
+      </ul>
+      <p><strong>Total:</strong> ₹<%= order.totalAmount %></p>
+      <p><strong>Ordered At:</strong> <%= order.createdAt.toLocaleString() %></p>
+    
+       <!-- Added Review Button -->
+      <% if (order.status && order.status.trim() === 'Completed' && !order.isReviewed) { %>
+  <a href="/review/<%= order._id %>" class="btn btn-outline-danger mt-3">Review Food</a>
+<% } %>
+
+    </div>
+  <% }) %>
+
+
     <% } else { %>
       <p class="text-center text-muted">You have not placed any orders yet.</p>
     <% } %>
+    </div>
 
     <div class="text-center">
       <a href="/main" class="back-btn">⬅ Back to Main</a>
     </div>
   </div>
+
+  <script>
+  async function fetchOrders() {
+    try {
+      const response = await fetch('/api/myorders');
+      const orders = await response.json();
+      orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort newest first
+
+      const container = document.getElementById('ordersList');
+      if (!container) return;
+
+      if (!Array.isArray(orders) || orders.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">You have not placed any orders yet.</p>';
+        return;
+      }
+
+     container.innerHTML = orders.map(order => {
+  const statusClass = order.status.replace(/ /g, '\\\\ ');
+  const itemsHTML = order.items.map(item => 
+    `<li>${item.name} x ${item.quantity} — ₹${item.price}</li>`).join('');
+  const createdAt = new Date(order.createdAt).toLocaleString();
+
+  // ✅ Add this block here
+  let reviewButtonHTML = '';
+  if (order.status === 'Completed' && !order.isReviewed) {
+    reviewButtonHTML = `<a href="/review/${order._id}" class="btn btn-outline-danger mt-3">Review Food</a>`;
+  }
+
+  return `
+    <div class="order-card">
+      <div class="status-badge status-${statusClass}">${order.status}</div>
+      <h5>Order #${order._id}</h5>
+      <ul>${itemsHTML}</ul>
+      <p><strong>Total:</strong> ₹${order.totalAmount}</p>
+      <p><strong>Ordered At:</strong> ${createdAt}</p>
+      ${reviewButtonHTML}
+    </div>
+  `;
+}).join('');
+
+
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    }
+  }
+
+  // Initial load
+  fetchOrders();
+  // Auto-refresh every 5 seconds
+  setInterval(fetchOrders, 5000);
+</script>
+
 
 </body>
 </html>

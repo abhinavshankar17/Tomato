@@ -25,6 +25,10 @@ const orderSchema = new mongoose.Schema({
   status: {
     type: String,
     default: 'Confirmed',
+  },
+  isReviewed: {
+    type: Boolean,
+    default: false
   }
 });
 

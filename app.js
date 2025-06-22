@@ -23,6 +23,7 @@ const menuRoutes = require('./routes/menu');
 const Restaurant = require('./models/owners'); 
 const MenuItem = require('./models/menuItem'); 
 const Order = require('./models/order'); // Import Order model
+const Review = require('./models/review');
 
 // ------------------ MONGOOSE SETUP ------------------
 mongoose.connect('mongodb://localhost:27017/Tomato')
@@ -389,6 +390,58 @@ app.get('/api/myorders', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+app.get('/review/:orderId', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.orderId);
+    res.render('users/review', { order });
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Failed to load review page');
+    res.redirect('/myorders');
+  }
+});
+
+app.post('/review/:orderId', async (req, res) => {
+  try {
+    const { ratings } = req.body;
+    const { orderId } = req.params;
+
+    // Process each rated item
+    for (let itemName in ratings) {
+      const ratingValue = parseInt(ratings[itemName]);
+
+      // Skip if rating is invalid
+      if (!ratingValue || ratingValue < 1 || ratingValue > 5) continue;
+
+      // Find matching menu item
+      const item = await MenuItem.findOne({ name: itemName });
+      if (!item) continue;
+
+      // Initialize rating fields if they don't exist
+      if (!item.totalRating) item.totalRating = 0;
+      if (!item.ratingCount) item.ratingCount = 0;
+
+      // Update rating
+      item.totalRating += ratingValue;
+      item.ratingCount += 1;
+      await item.save();
+    }
+
+    // ✅ Mark this order as reviewed
+    await Order.findByIdAndUpdate(orderId, { isReviewed: true });
+
+    req.flash('success', 'Thank you for reviewing your order!');
+    res.redirect('/myorders'); // or wherever you want
+
+  } catch (err) {
+    console.error('Review submission error:', err);
+    req.flash('error', 'Something went wrong while submitting your review.');
+    res.redirect('/myorders');
+  }
+});
+
+
 
 
 
