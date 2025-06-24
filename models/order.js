@@ -7,12 +7,17 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
   items: [
-    {
-      name: String,
-      quantity: Number,
-      price: Number
+  {
+    name: String,
+    quantity: Number,
+    price: Number,
+    menuItemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'MenuItem',
+      required: true
     }
-  ],
+  }
+],
   totalAmount: Number,
   customer: {
     type: mongoose.Schema.Types.ObjectId,

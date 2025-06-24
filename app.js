@@ -332,22 +332,27 @@ app.post('/order/confirm', async (req, res) => {
     const totalAmount = req.body.totalAmount;
     const restaurantId = req.body.restaurantId;
     const customerId = req.user._id;
+    console.log("Order Summary Items:");
+    console.log(summary.map(i => ({ name: i.name, itemId: i.itemId })));
+
 
     if (!restaurantId || !summary || summary.length === 0) {
       req.flash('error', 'Invalid order data');
       return res.redirect('/main');
     }
 
-    const newOrder = new Order({
-      restaurant: restaurantId,
-      items: summary.map(item => ({
-        name: item.name,
-        quantity: item.quantity,
-        price: item.total
-      })),
-      totalAmount,
-      customer: customerId
-    });
+   const newOrder = new Order({
+  restaurant: restaurantId,
+  items: summary.map(item => ({
+    name: item.name,
+    quantity: item.quantity,
+    price: item.total,
+    menuItemId: item.itemId  //  This is the key part
+  })),
+  totalAmount,
+  customer: customerId
+});
+
 
     await newOrder.save();
 
@@ -393,7 +398,18 @@ app.get('/api/myorders', async (req, res) => {
 
 app.get('/review/:orderId', async (req, res) => {
   try {
-    const order = await Order.findById(req.params.orderId);
+    const order = await Order.findById(req.params.orderId).lean();
+
+    // Add fallback if menuItemId is missing
+    if (order && order.items) {
+      order.items = order.items.map(item => {
+        return {
+          ...item,
+          menuItemId: item.menuItemId || item._id  // fallback
+        };
+      });
+    }
+
     res.render('users/review', { order });
   } catch (err) {
     console.error(err);
@@ -402,44 +418,37 @@ app.get('/review/:orderId', async (req, res) => {
   }
 });
 
+
 app.post('/review/:orderId', async (req, res) => {
+  const { ratings } = req.body; // ratings: { menuItemId1: "4", menuItemId2: "3", ... }
   try {
-    const { ratings } = req.body;
-    const { orderId } = req.params;
+    for (const [menuItemId, rating] of Object.entries(ratings)) {
+      const item = await MenuItem.findById(menuItemId);
+      if (!item) {
+        console.log(`Item not found: ${menuItemId}`);
+        continue;
+      }
 
-    // Process each rated item
-    for (let itemName in ratings) {
-      const ratingValue = parseInt(ratings[itemName]);
+      const parsedRating = parseInt(rating);
+      item.ratingCount = (item.ratingCount || 0) + 1;
+      item.totalRating = (item.totalRating || 0) + parsedRating;
+      item.averageRating = item.totalRating / item.ratingCount;
 
-      // Skip if rating is invalid
-      if (!ratingValue || ratingValue < 1 || ratingValue > 5) continue;
-
-      // Find matching menu item
-      const item = await MenuItem.findOne({ name: itemName });
-      if (!item) continue;
-
-      // Initialize rating fields if they don't exist
-      if (!item.totalRating) item.totalRating = 0;
-      if (!item.ratingCount) item.ratingCount = 0;
-
-      // Update rating
-      item.totalRating += ratingValue;
-      item.ratingCount += 1;
       await item.save();
     }
 
-    // ✅ Mark this order as reviewed
-    await Order.findByIdAndUpdate(orderId, { isReviewed: true });
+    // Optionally mark order as reviewed
+    await Order.findByIdAndUpdate(req.params.orderId, { isReviewed: true });
 
-    req.flash('success', 'Thank you for reviewing your order!');
-    res.redirect('/myorders'); // or wherever you want
-
+    req.flash('success', 'Thank you for your feedback!');
+    res.redirect('/myorders');
   } catch (err) {
     console.error('Review submission error:', err);
     req.flash('error', 'Something went wrong while submitting your review.');
     res.redirect('/myorders');
   }
 });
+
 
 
 

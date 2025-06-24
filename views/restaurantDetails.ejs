@@ -162,15 +162,16 @@
         <p class="card-text text-muted"><%= item.description %></p>
         <p class="card-price" data-price="<%= item.price %>">₹<%= item.price %></p>
 
-        <% if (item.numRatings > 0) { %>
+        <% if (item.ratingCount && item.ratingCount > 0) { %>
   <p class="text-warning mb-2">
-    <%= item.rating.toFixed(1) %> 
+    <%= item.averageRating.toFixed(1) %> 
     <i class="bi bi-star-fill"></i>
-    (<%= item.numRatings %> ratings)
+    (<%= item.ratingCount %> ratings)
   </p>
 <% } else { %>
   <p class="text-muted mb-2">No ratings yet</p>
 <% } %>
+
 
 
         <!-- Add to Cart Button -->

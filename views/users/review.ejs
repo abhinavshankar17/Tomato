@@ -69,23 +69,25 @@
 
   <h2>Review Your Order</h2>
 
-  <form action="/review/<%= order._id %>" method="POST" class="review-form">
-    <% order.items.forEach(item => { %>
-      <div class="form-group">
-        <label><%= item.name %></label>
-        <select name="ratings[<%= item.name %>]" class="star-select">
-          <option value="">⭐ Select Rating</option>
-          <% for (let i = 1; i <= 5; i++) { %>
-            <option value="<%= i %>"><%= '★'.repeat(i) %> (<%= i %>)</option>
-          <% } %>
-        </select>
-      </div>
-    <% }) %>
-
-    <div class="text-center">
-      <button type="submit" class="submit-btn">Submit Review</button>
+<form action="/review/<%= order._id %>" method="POST" class="review-form">
+  <% order.items.forEach(item => { %>
+    <div class="form-group">
+      <label><%= item.name %></label>
+      <% console.log(item) %>
+        <select name="ratings[<%= item.menuItemId.toString() %>]" class="star-select" required>
+        <option value="">⭐ Select Rating</option>
+        <% for (let i = 1; i <= 5; i++) { %>
+          <option value="<%= i %>"><%= '★'.repeat(i) %> (<%= i %>)</option>
+        <% } %>
+      </select>
     </div>
-  </form>
+  <% }) %>
+  <div class="text-center">
+    <button type="submit" class="submit-btn">Submit Review</button>
+  </div>
+</form>
+
+
 
 </body>
 </html>

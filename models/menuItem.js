@@ -17,11 +17,15 @@ const menuItemSchema = new mongoose.Schema({
     ref: 'Owner', 
     required: true 
   },
-  rating: {
+  ratingCount: {
     type: Number,
     default: 0
   },
-  numRatings: {
+  totalRating: {
+    type: Number,
+    default: 0
+  },
+  averageRating: {
     type: Number,
     default: 0
   }
