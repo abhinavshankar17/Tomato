@@ -237,20 +237,34 @@ app.get('/main', async (req, res) => {
 
 
 
+// app.get('/restaurant/:id', async (req, res) => {
+//   try {
+//     const restaurant = await Restaurant.findById(req.params.id);
+//     const menuItems = await MenuItem.find({ owner: restaurant._id });
+
+//     if (!restaurant) {
+//       return res.status(404).send('Restaurant not found');
+//     }
+
+//     res.render('restaurantDetails', { restaurant, menuItems });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Something went wrong');
+//   }
+// });
+
 app.get('/restaurant/:id', async (req, res) => {
-  try {
-    const restaurant = await Restaurant.findById(req.params.id);
-    const menuItems = await MenuItem.find({ owner: restaurant._id });
+  const showOnlyVeg = req.query.veg === 'true';
+  const restaurant = await Restaurant.findById(req.params.id);
+  let menuItems;
 
-    if (!restaurant) {
-      return res.status(404).send('Restaurant not found');
-    }
-
-    res.render('restaurantDetails', { restaurant, menuItems });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Something went wrong');
+  if (showOnlyVeg) {
+    menuItems = await MenuItem.find({ owner: restaurant._id, category: 'Veg' });
+  } else {
+    menuItems = await MenuItem.find({ owner: restaurant._id });
   }
+
+  res.render('restaurantDetails', { restaurant, menuItems });
 });
 
 
