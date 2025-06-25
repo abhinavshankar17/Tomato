@@ -103,6 +103,7 @@
           <label for="cuisineSelect" class="form-label fw-semibold">Select Cuisine</label>
           <select id="cuisineSelect" class="form-select">
             <option value="">Choose a cuisine</option>
+            <option value="continental">Continental</option>
             <option value="indian">Indian</option>
             <option value="chinese">Chinese</option>
             <option value="italian">Italian</option>
@@ -115,12 +116,23 @@
       </div>
 
       <div class="modal-footer border-0 justify-content-between">
-        <button class="btn btn-light">Clear all</button>
-        <button class="btn btn-danger">Apply</button>
+        <button class="btn btn-light" id="clearFilterBtn" type="button">Clear all</button>
+        <button class="btn btn-danger" onclick="applyCuisineFilter()">Apply</button>
+
       </div>
     </div>
   </div>
 </div>
+<script>
+  function applyCuisineFilter() {
+    const selectedCuisine = document.getElementById("cuisineSelect").value;
+    if (selectedCuisine) {
+      window.location.href = `/main?cuisine=${selectedCuisine}`;
+    } else {
+      window.location.href = `/main`;
+    }
+  }
+</script>
 
 
 
@@ -281,6 +293,14 @@
 
   <%- include('partials/footer') %>
 
+
+
+<script>
+  document.getElementById('clearFilterBtn')?.addEventListener('click', () => {
+    const baseUrl = window.location.origin + '/main';
+    window.location.href = baseUrl;
+  });
+</script>
 
 <script>
   // Restore city value if session resets

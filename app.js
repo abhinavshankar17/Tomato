@@ -178,9 +178,66 @@ app.get('/restaurant', (req, res) => res.render('restaurant'));
 app.get('/menu', (req, res) => res.render('owners/menu'));
 
 
+// app.get('/main', async (req, res) => {
+//   try {
+//     let city = (req.session.city || '').trim();
+
+//     // Set flash message if not logged in
+//     if (!req.user) {
+//       req.flash('error', 'You should be logged in to see the restaurants near you');
+//     }
+
+//     const baseQuery = { isLive: true };
+//     let cityQuery = {};
+
+//     if (city) {
+//       cityQuery = {
+//         restaurantAddress: { $regex: city, $options: 'i' }  // case-insensitive substring match
+//       };
+//     }
+
+//     const onlineRestaurants = await Owner.find({ ...baseQuery, ...cityQuery });
+
+//     if (onlineRestaurants.length === 0) {
+//       req.flash('error', 'No restaurants found in your area.');
+//       return res.render('main', {
+//         currentUser: req.user,
+//         onlineRestaurants: [],
+//         city,
+//         error: req.flash('error'),
+//         success: req.flash('success')
+//       });
+//     }
+
+//     const restaurantsWithImages = await Promise.all(
+//       onlineRestaurants.map(async (owner) => {
+//         const item = await MenuItem.findOne({
+//           owner: owner._id,
+//           imageUrl: { $exists: true, $ne: '' },
+//         });
+//         return {
+//           ...owner.toObject(),
+//           menuImage: item?.imageUrl || null,
+//         };
+//       })
+//     );
+
+//     res.render('main', {
+//       currentUser: req.user,
+//       onlineRestaurants: restaurantsWithImages,
+//       city,
+//       error: req.flash('error'),
+//       success: req.flash('success')
+//     });
+//   } catch (err) {
+//     console.error('Error in /main:', err);
+//     res.status(500).send("Error loading main page");
+//   }
+// });
 app.get('/main', async (req, res) => {
   try {
     let city = (req.session.city || '').trim();
+    const selectedCuisine = req.query.cuisine;
 
     // Set flash message if not logged in
     if (!req.user) {
@@ -192,11 +249,19 @@ app.get('/main', async (req, res) => {
 
     if (city) {
       cityQuery = {
-        restaurantAddress: { $regex: city, $options: 'i' }  // case-insensitive substring match
+        restaurantAddress: { $regex: city, $options: 'i' }
       };
     }
 
-    const onlineRestaurants = await Owner.find({ ...baseQuery, ...cityQuery });
+    // Add cuisine filter if it's present in the query
+    let cuisineQuery = {};
+    if (selectedCuisine) {
+      cuisineQuery = {
+        cuisineType: { $regex: selectedCuisine, $options: 'i' }
+      };
+    }
+
+    const onlineRestaurants = await Owner.find({ ...baseQuery, ...cityQuery, ...cuisineQuery });
 
     if (onlineRestaurants.length === 0) {
       req.flash('error', 'No restaurants found in your area.');
@@ -205,7 +270,8 @@ app.get('/main', async (req, res) => {
         onlineRestaurants: [],
         city,
         error: req.flash('error'),
-        success: req.flash('success')
+        success: req.flash('success'),
+        cuisine: selectedCuisine // pass for selected dropdown
       });
     }
 
@@ -227,7 +293,8 @@ app.get('/main', async (req, res) => {
       onlineRestaurants: restaurantsWithImages,
       city,
       error: req.flash('error'),
-      success: req.flash('success')
+      success: req.flash('success'),
+      cuisine: selectedCuisine // pass for template use if needed
     });
   } catch (err) {
     console.error('Error in /main:', err);
