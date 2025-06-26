@@ -302,7 +302,8 @@ app.get('/main', async (req, res) => {
   }
 });
 
-
+const ownerAnalyticsRoutes = require('./routes/ownerAnalytics');
+app.use('/owners', ownerAnalyticsRoutes);
 
 // app.get('/restaurant/:id', async (req, res) => {
 //   try {

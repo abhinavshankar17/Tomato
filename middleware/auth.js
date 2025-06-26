@@ -12,3 +12,9 @@ module.exports.isOwnerLoggedIn = (req, res, next) => {
   res.redirect('/owners/restaurantlogin');
 };
 
+module.exports.ensureOwnerAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated() && req.user && req.user.restaurantName) {
+    return next();
+  }
+  res.status(401).json({ error: 'Unauthorized' });
+}
