@@ -58,7 +58,29 @@ Customers can browse restaurants, order food, and leave reviews — while restau
 
 ## 📸 Screenshots
 
-> Add your screenshots here (homepage, restaurant dashboard, analytics page, etc.)
+### 🍽️ For Customers
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20014950.png)
+
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015015.png)
+
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015052.png)
+
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015117.png)
+
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015255.png)
+
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015151.png)
+
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015306.png)
+
+
+
+
+### 🧑‍🍳 For Restaurant Owners
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015346.png)
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015338.png)
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015356.png)
+![image alt](https://github.com/abhinavshankar17/Tomato/blob/726bd95747bb8f2597d22d8462e7a8a56074346c/public/images/Screenshot%202025-06-29%20015405.png)
 
 ---
 
