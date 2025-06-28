@@ -62,6 +62,10 @@ Customers can browse restaurants, order food, and leave reviews — while restau
 
 ---
 
+## 🙌 Special Thanks
+
+- 💡 **ChatGPT by OpenAI** — for helping with bug fixes, code suggestions, UI ideas, and improving the overall development experience.
+
 ## 📬 Contact
 
 Made with ❤️ by [Abhinav Shankar](https://github.com/abhinavshankar17)  
