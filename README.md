@@ -72,7 +72,7 @@ Feel free to connect or contribute!
 ## 🎥 UI Walkthrough
 
 Check out a full demo of Tomato in action:  
-👉 [Watch on YouTube](https://www.youtube.com/watch?v=your-demo-video-link)
+👉 [Watch on YouTube](https://youtu.be/YE5W-vDbftc)
 
 ---
 
